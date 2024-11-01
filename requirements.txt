@@ -1,3 +1,4 @@
 django==5.1.2
 djangorestframework
 requests
+python-dotenv
