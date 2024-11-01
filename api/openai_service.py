@@ -32,8 +32,8 @@ def get_openai_response(messages, temperature=0.7, model_name="gpt-4o"):
         if not model:
             raise ValueError("No active models are available in the database. Please configure a model.")
 
-    # Construct the API request using the model endpoint
-    url = f"{settings.AZURE_OPENAI_ENDPOINT}{model.endpoint}"
+    url = f"{settings.AZURE_OPENAI_ENDPOINT}/openai/deployments/{model.endpoint}/chat/completions?api-version=2024-06-01" 
+    
     headers = {
         "Content-Type": "application/json",
         "api-key": settings.AZURE_OPENAI_API_KEY,
