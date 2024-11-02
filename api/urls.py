@@ -7,4 +7,5 @@ urlpatterns = [
     path("api/generate-response/", views.generate_response, name="generate_response"),
     path("api/check-authentication/", views.check_authentication, name="check_authentication"),
     path("api/set-csrf-token/", views.set_csrf_token, name="set_csrf_token"),
+    path("api/get-options/", views.get_options, name="get_options"),
 ]

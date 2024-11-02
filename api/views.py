@@ -7,7 +7,8 @@ from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
 import json
-
+from .models import OpenAIModel
+from .enums import Temperature
 
 def redirect_to_frontend(request):
     return redirect("http://localhost:5173") 
@@ -36,6 +37,10 @@ def generate_response(request):
     Returns:
         JsonResponse: JSON response containing the AI's reply or an error message.
     """
+    if request.session.get("is_processing"):
+        return JsonResponse({"error": "Another request is already in progress"}, status=400)
+    
+    request.session["is_processing"] = True
     try:
         # Parse JSON payload
         data = json.loads(request.body)
@@ -63,4 +68,21 @@ def generate_response(request):
         return JsonResponse({"error": "Invalid JSON data"}, status=400)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
-    
+    finally:
+        request.session["is_processing"] = False
+
+
+@login_required
+def get_options(request):
+    """
+    Django view that returns the available models and temperature options.
+
+    Returns:
+        JsonResponse: JSON response containing the available models and temperature options.
+    """
+    models = OpenAIModel.objects.filter(active=True).values_list("name", flat=True)
+    temperatures = [temperature.value for temperature in Temperature]
+    return JsonResponse({
+        "models": list(models),
+        "temperatures": temperatures
+    })
