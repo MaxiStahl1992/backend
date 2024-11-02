@@ -146,6 +146,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Load environment variables from .env file
 AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
 AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
+ALPHA_VANTAGE_API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
 
 # Redirect links
 LOGIN_REDIRECT_URL = "/"
