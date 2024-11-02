@@ -3,13 +3,16 @@ from .openai_service import get_openai_response
 from django.conf import settings
 from .enums import Temperature
 from django.contrib.auth.decorators import login_required
+from django.middleware.csrf import get_token
+from django.shortcuts import redirect
 
+
+def redirect_to_frontend(request):
+    return redirect("http://localhost:5173") 
 
 @login_required
-def home(request):
-    print("This is the home view")
-    return HttpResponse("Home!")
-
+def check_authentication(request):
+    return JsonResponse({"isAuthenticated": True})
 
 @login_required
 def generate_response(request):
