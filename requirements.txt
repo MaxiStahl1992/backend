@@ -1,4 +1,5 @@
 django==5.1.2
 djangorestframework
+django-cors-headers
 requests
 python-dotenv
