@@ -3,12 +3,13 @@ from .openai_service import get_openai_response
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators.csrf import ensure_csrf_cookie
 import json
 from .models import OpenAIModel, ChatMessage, ChatSession
 from .enums import Temperature
 from uuid import UUID
+import requests
 
 def redirect_to_frontend(request):
     return redirect("http://localhost:5173") 
@@ -177,3 +178,40 @@ def delete_chat(request, chat_id):
         })
     except ChatSession.DoesNotExist:
         return JsonResponse({"error": "Chat session not found"}, status=404)
+
+
+# Weather API
+@require_GET
+def get_weather_data(request):
+    # Retrieve latitude and longitude from query parameters
+    latitude = request.GET.get('latitude')
+    longitude = request.GET.get('longitude')
+    
+    # Check if coordinates are provided
+    if not latitude or not longitude:
+        return JsonResponse({"error": "Latitude and longitude are required"}, status=400)
+
+    # Set up Open-Meteo API endpoint with desired parameters
+    weather_url = (
+        "https://api.open-meteo.com/v1/forecast"
+        f"?latitude={latitude}&longitude={longitude}&current_weather=true"
+    )
+
+    try:
+        # Make request to Open-Meteo API
+        response = requests.get(weather_url)
+        response.raise_for_status()
+        weather_data = response.json().get("current_weather", {})
+        
+        # Structure the response data
+        data = {
+            "temperature": weather_data.get("temperature"),
+            "windspeed": weather_data.get("windspeed"),
+            "winddirection": weather_data.get("winddirection"),
+            "weathercode": weather_data.get("weathercode"),
+            "time": weather_data.get("time"),
+        }
+
+        return JsonResponse(data)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({"error": "Failed to fetch weather data"}, status=500)
