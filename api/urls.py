@@ -8,4 +8,8 @@ urlpatterns = [
     path("api/check-authentication/", views.check_authentication, name="check_authentication"),
     path("api/set-csrf-token/", views.set_csrf_token, name="set_csrf_token"),
     path("api/get-options/", views.get_options, name="get_options"),
+    path('api/create-chat/', views.create_new_chat, name="create_new_chat"),
+    path('api/chat-history/<uuid:chat_id>/', views.retrieve_chat_history, name="retrieve_chat_history"),
+    path('api/delete-chat/<uuid:chat_id>/', views.delete_chat, name="delete_chat"),
+    path("api/chats/", views.list_chats, name="list_chats"), 
 ]
