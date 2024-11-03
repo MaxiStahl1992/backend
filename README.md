@@ -5,15 +5,13 @@
 This project provides a Django-based backend that facilitates chat sessions between users and an AI assistant. It includes various endpoints for managing chat sessions, retrieving chat histories, and interacting with the AI.
 
 # Tech Stack
-
-	•	Backend: Django
-	•	Containerization: Docker
-	•	Database: SQLite (local file-based database)
-	•	AI Integration: Uses OpenAI models through Azure API
+•	Backend: Django
+•	Containerization: Docker
+•	Database: SQLite (local file-based database)
+•	AI Integration: Uses OpenAI models through Azure API
 
 # Requirements
-
-	•	Docker and Docker Compose installed
+•	Docker and Docker Compose installed
 
 # Setup & Installation
 
@@ -79,8 +77,8 @@ docker-compose exec web python manage.py test
 ```
 
 # Troubleshooting
-	•	OpenAI API Errors:
-    Ensure AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_API_KEY are properly configured in .env.
+• OpenAI API Errors:
+Ensure AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_API_KEY are properly configured in .env.
 
 Known Issues
-    •	Minimal test coverage
+•   Minimal test coverage
