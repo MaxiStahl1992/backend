@@ -207,6 +207,7 @@ def regenerate_message(request, chat_id):
             for msg in reversed(recent_messages)
         ]
     ]
+    print(messages)
 
     # Use the last user message as the final prompt
     last_user_message = next((msg for msg in reversed(recent_messages) if msg.sender == "user"), None)
