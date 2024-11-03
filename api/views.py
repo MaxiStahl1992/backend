@@ -318,3 +318,4 @@ def get_weather_data(request):
     except requests.exceptions.RequestException:
         logger.exception("Failed to fetch weather data")
         return JsonResponse({"error": "Failed to fetch weather data"}, status=500)
+    
