@@ -23,10 +23,11 @@ class ChatSession(models.Model):
 
 class ChatMessage(models.Model):
     chat = models.ForeignKey(ChatSession, on_delete=models.CASCADE, related_name="messages")
-    sender = models.CharField(max_length=10)  # 'user' or 'ai'
+    sender = models.CharField(max_length=10)
     content = models.TextField()
     model_name = models.CharField(max_length=100)
     temperature = models.FloatField()
+    regenerated = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

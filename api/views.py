@@ -10,6 +10,8 @@ from .models import OpenAIModel, ChatMessage, ChatSession
 from .enums import Temperature
 from uuid import UUID
 import requests
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 def redirect_to_frontend(request):
     return redirect("http://localhost:5173") 
@@ -149,7 +151,7 @@ def retrieve_chat_history(request, chat_id):
     """
     try:
         chat = ChatSession.objects.get(id=chat_id, user=request.user)
-        messages = chat.messages.values("sender", "content", "timestamp", "model_name", "temperature")
+        messages = chat.messages.filter(regenerated=False).values("sender", "content", "timestamp", "model_name", "temperature")
         return JsonResponse({"messages": list(messages)})
     except ChatSession.DoesNotExist:
         return JsonResponse({"error": "Chat session not found"}, status=404)
@@ -178,6 +180,59 @@ def delete_chat(request, chat_id):
         })
     except ChatSession.DoesNotExist:
         return JsonResponse({"error": "Chat session not found"}, status=404)
+
+@require_POST
+@login_required
+def regenerate_message(request, chat_id):
+    """
+    Marks the last AI message as "regenerated" and re-fetches a response based on the last user message
+    and the previous five messages as context.
+    """
+    # Retrieve the chat session
+    chat = get_object_or_404(ChatSession, id=chat_id, user=request.user)
+
+    # Find the last AI message and mark it as regenerated
+    last_ai_message = chat.messages.filter(sender="ai", regenerated=False).order_by("-timestamp").first()
+    if not last_ai_message:
+        return JsonResponse({"error": "No AI message to regenerate."}, status=400)
+    last_ai_message.regenerated = True
+    last_ai_message.save()
+
+    # Retrieve recent messages, excluding those marked for regeneration
+    recent_messages = chat.messages.filter(regenerated=False).order_by("-timestamp")[:5]
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant."},
+        *[
+            {"role": msg.sender if msg.sender != "ai" else "assistant", "content": msg.content}
+            for msg in reversed(recent_messages)
+        ]
+    ]
+
+    # Use the last user message as the final prompt
+    last_user_message = next((msg for msg in reversed(recent_messages) if msg.sender == "user"), None)
+    if last_user_message:
+        messages.append({"role": "user", "content": last_user_message.content})
+    else:
+        return JsonResponse({"error": "No user message found for regeneration."}, status=400)
+
+    # Generate a new AI response based on the last user message and recent context
+    try:
+        openai_response = get_openai_response(messages, temperature=last_user_message.temperature, model_name=last_user_message.model_name)
+        regenerated_content = openai_response.get("choices", [{}])[0].get("message", {}).get("content", "")
+
+        # Save the new AI message in the database
+        new_ai_message = ChatMessage.objects.create(
+            chat=chat,
+            sender="ai",
+            content=regenerated_content,
+            model_name=last_user_message.model_name,
+            temperature=last_user_message.temperature,
+            timestamp=timezone.now(),
+        )
+
+        return JsonResponse({"content": new_ai_message.content})
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
 
 # Weather API
