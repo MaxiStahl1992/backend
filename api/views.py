@@ -76,7 +76,7 @@ def generate_response(request):
         messages = [
             {"role": "system", "content": "You are a helpful assistant."},
             *[
-                {"role": msg.sender, "content": msg.content}
+                {"role": msg.sender if msg.sender != "ai" else "assistant", "content": msg.content}
                 for msg in reversed(recent_messages)
             ],
             {"role": "user", "content": user_message},
@@ -216,31 +216,3 @@ def get_weather_data(request):
     except requests.exceptions.RequestException as e:
         return JsonResponse({"error": "Failed to fetch weather data"}, status=500)
 
-# Stocks API
-@login_required
-@require_GET
-def get_stock_data(request):
-    """
-    Retrieves stock data for a specified symbol using Alpha Vantage API.
-    Expects a 'symbol' query parameter.
-    """
-    symbol = request.GET.get("symbol")
-    if not symbol:
-        return JsonResponse({"error": "Stock symbol is required"}, status=400)
-    
-    api_key = settings.ALPHA_VANTAGE_API_KEY
-    url = f"https://www.alphavantage.co/query"
-    params = {
-        "function": "TIME_SERIES_INTRADAY",
-        "symbol": symbol,
-        "interval": "5min",
-        "apikey": api_key
-    }
-    
-    try:
-        response = requests.get(url, params=params)
-        response.raise_for_status()
-        stock_data = response.json()
-        return JsonResponse(stock_data)
-    except requests.RequestException as e:
-        return JsonResponse({"error": str(e)}, status=500)

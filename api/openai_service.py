@@ -42,11 +42,17 @@ def get_openai_response(messages, temperature=0.7, model_name="gpt-4o"):
         "messages": messages,
         "temperature": temperature,
     }
+    
+    print("Request URL:", url)
+    print("Headers:", headers)
+    print("Payload:", data)
 
     try:
         response = requests.post(url, headers=headers, json=data)
-        response.raise_for_status()
+        response.raise_for_status()  # This will trigger an HTTPError if the response was unsuccessful
+        print("API Response:", response.json())  # Log the response for inspection
         return response.json()
     except requests.exceptions.RequestException as e:
-        print(f"OpenAI API request failed: {e}")
+        print("OpenAI API request failed:", e)
+        print("Response content:", response.content)  # Log response content for better debugging
         raise
