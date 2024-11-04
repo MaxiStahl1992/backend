@@ -19,7 +19,10 @@ This project provides a Django-based backend that facilitates chat sessions betw
 2.	Environment Variables
 Create a .env file in the project root with the necessary configurations. Required variables include:
 - SECRET_KEY: Django’s secret key
-- AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_API_KEY: Credentials for accessing the Azure OpenAI API
+- AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_API_KEY:
+    - Credentials for accessing the Azure OpenAI API.
+    - Add the endpoint without a trailing slash.
+    - Be careful when adding the API KEY, it must be in one line without any additional chars. 
 3.	Build and Run the Docker Container
 ```bash
 docker-compose up --build
