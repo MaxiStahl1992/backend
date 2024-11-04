@@ -24,9 +24,10 @@ Create a .env file in the project root with the necessary configurations. Requir
 ```bash
 docker-compose up --build
 ```
-4.	Initialize the SQLite database by running migrations:
+4.	Initialize the SQLite database locally by running migrations:
 ```bash
-docker-compose exec web python manage.py migrate
+python manage.py makemigrations
+python manage.py migrate 
 ```
 5.	Create a Superuser to access the Django admin interface:
 ```bash
