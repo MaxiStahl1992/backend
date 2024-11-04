@@ -24,17 +24,16 @@ Create a .env file in the project root with the necessary configurations. Requir
 ```bash
 docker-compose up --build
 ```
-4.	Initialize the SQLite database locally by running migrations (Make sure Django is installede locally):
+4.	Initialize the SQLite database:
 ```bash
-python manage.py makemigrations
-python manage.py migrate 
+docker-compose exec web python manage.py migrate
 ```
 5.	Create a Superuser to access the Django admin interface:
 ```bash
 docker-compose exec web python manage.py createsuperuser
 ```
-6. Configure a User and a the correct endpoint name for an azure openai instance.
-7.	Accessing the API
+6. Got to http://localhost:8000/admin/ and configure the correct endpoint name for an azure openai instance (gpt-4o or gpt-4o-mini).
+7. Accessing the API
     The API will be available at http://localhost:8000.
 
 # API Endpoints
